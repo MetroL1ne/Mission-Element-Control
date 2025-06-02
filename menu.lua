@@ -16,6 +16,14 @@ function AdminMissionElementsList:setup()
 	self._on_mouse_panel = {}
 	self._info_class = {}
 
+	self._value_exclude = {
+		"execute_on_startup",
+		"enabled",
+		"trigger_times",
+		"base_delay",
+		"base_delay_rand"
+	}
+
 	self:switch()
 end
 
@@ -269,28 +277,6 @@ function AdminMissionElementsList:wheel_scroll(items, h, panel_h, dy)
 	end
 end
 
--- function AdminMissionElementsList:update_list_with_scroll_bar(x, y)
--- 	if self._elements_scroll._scroll._grabbed_scroll_bar then
--- 		-- 计算当前滚动比例 (0 到 1)
--- 		local scroll_ratio = (self._elements_scroll._scroll._scroll_bar:y() - 16) / 
--- 							(self._elements_scroll._scroll:panel():h() - 48)
-
-
--- 		-- 计算内容面板的最大滚动距离
--- 		local max_content_scroll = (self._mission_element_h * #self._elements_scroll:items()) - self._elements_scroll:h()
-
--- 		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
--- 		local target_content_y = -scroll_ratio * max_content_scroll
--- 		local current_content_y = self._elements_scroll:items()[1]:top()
-
--- 		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
--- 		local dy = target_content_y - current_content_y
-
--- 		-- 调用 wheel_scroll 进行滚动
--- 		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), dy)
--- 	end
--- end
-
 function AdminMissionElementsList:update_list_with_scroll_bar()
 	if self._elements_scroll._scroll._grabbed_scroll_bar then
 		local canvas_h = self._elements_scroll._scroll:canvas():h() ~= 0 and self._elements_scroll._scroll:canvas():h() or 1
@@ -412,6 +398,15 @@ function AdminMissionElementsList:show_mission_elements()
 
 	self._ui.info:set_left(self._ui.mission_element:right())
 	self._ui.info:set_top(self._ui.mission_element:top())
+
+	local info_rect = self._ui.info:bitmap({
+		render_template = "VertexColorTexturedBlur3D",
+		texture = "guis/textures/test_blur_df",
+		w = self._ui.info:w(),
+		h = self._ui.info:h(),
+		layer = -2,
+		color = Color.white
+	})
 
 	BoxGuiObject:_create_side(self._ui.info, "left", 1, false, false)
 	BoxGuiObject:_create_side(self._ui.info, "right", 1, false, false)
@@ -594,7 +589,6 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 	enabled:set_callback(function()
 		local state = not element._values.enabled
 		element._values.enabled = state
-		-- self:send_log(element:editor_name(), element:id(), element._values.enabled)
 	end)
 
 	-- Trigger Times
@@ -616,9 +610,9 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		managers.mouse_pointer:set_pointer_image("arrow")
 	end)
 
-	trigger_times:set_clickout_callback(function(s_time)
+	trigger_times:set_clickout_callback(function(time)
 		self._selected = false
-		local time = tonumber(s_time)
+		self:send_log(type(time))
 		element:set_trigger_times(time)
 	end)
 
@@ -641,9 +635,9 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		managers.mouse_pointer:set_pointer_image("arrow")
 	end)
 
-	base_delay:set_clickout_callback(function(s_time)
+	base_delay:set_clickout_callback(function(time)
 		self._selected = false
-		local time = tonumber(s_time)
+		self:send_log(type(time))
 		element._values.base_delay = time
 	end)
 
@@ -666,9 +660,8 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		managers.mouse_pointer:set_pointer_image("arrow")
 	end)
 
-	base_delay_rand:set_clickout_callback(function(s_time)
+	base_delay_rand:set_clickout_callback(function(time)
 		self._selected = false
-		local time = tonumber(s_time)
 		element._values.base_delay_rand = time
 	end)
 
@@ -742,10 +735,8 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		})
 
 		element_button = self._info_class["elements | " .. tostring(_element:id())]
-		self:send_log(_element:editor_name(), element_button)
 
 		element_button:set_callback(function()
-			self:send_log(_element:editor_name())
 			self:set_element_info(_element, self._ui.info, self._ui.title)
 		end)
 
@@ -787,10 +778,8 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		})
 
 		element_button = self._info_class["elements | " .. tostring(_element:id())]
-		self:send_log(_element:editor_name(), element_button)
 
 		element_button:set_callback(function()
-			self:send_log(_element:editor_name())
 			self:set_element_info(_element, self._ui.info, self._ui.title)
 		end)
 
@@ -798,6 +787,84 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 	end
 
 	for _, item in ipairs(link_to:items() or {}) do
+		item:set_left(2)
+	end
+
+	self._info_class.value_list = AdminScrollList:new(panel, {
+		scrollbar_padding = 0,
+		bar_minimum_size = 16,
+		padding = 0,
+		w = panel:w() / 2,
+		h = panel:h(),
+		input_focus = true,
+		title = "Value"
+	}, {
+		padding = 0
+	})
+
+	local value_list = self._info_class.value_list
+	value_list:panel():set_left(link_to:panel():right())
+	value_list:add_lines_and_static_down_indicator()
+
+	for name, v in pairs(element._values) do
+		local _return = false
+
+		for _, e_v in ipairs(self._value_exclude) do
+			if name == e_v then
+				_return = true
+			end
+		end
+
+		if not _return then
+			if type(v) == "boolean" then
+				self._info_class[name] = AdminToggleButton:new(value_list:panel(), {
+					visible = true,
+					text = name,
+					state = v,
+					w = _w - 24,
+					h = _h,
+					x = 2
+				})
+
+				local button_v = self._info_class[name]
+
+				button_v:set_callback(function(state)
+					element._values[name] = state
+				end)
+
+				value_list:add_item(button_v:panel())
+			elseif type(v) == "string" or type(v) == "number" then
+				local is_num_only = type(v) == "number"
+
+				self._info_class[name] = AdminInputBox:new(value_list:panel(), self._ws, {
+					visible = true,
+					text = name,
+					value = tostring(v or ""),
+					num_only = is_num_only,
+					w = _w - 24,
+					h = _h
+				})
+
+				local input_v = self._info_class[name]
+
+
+				input_v:set_click_callback(function()
+					self._selected = true
+					managers.mouse_pointer:set_pointer_image("arrow")
+				end)
+
+				input_v:set_clickout_callback(function(value)
+					self._selected = false
+					self:send_log(type(value))
+					element._values[name] = value
+				end)
+
+				value_list:add_item(input_v:panel())
+			end
+		end
+	end
+
+	for _, item in ipairs(value_list:items() or {}) do
 		item:set_left(2)
 	end
 end
@@ -1206,7 +1273,7 @@ end
 
 function AdminInputBox:clickout()
 	if self:clickout_callback() then
-		self:clickout_callback()(self._input_text:text())
+		self:clickout_callback()(self._num_only and tonumber(self._input_text:text()) or self._input_text:text())
 	end
 end
 
