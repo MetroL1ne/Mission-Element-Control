@@ -17,11 +17,7 @@ function AdminMissionElementsList:setup()
 	self._info_class = {}
 
 	self._value_exclude = {
-		"execute_on_startup",
-		"enabled",
-		"trigger_times",
-		"base_delay",
-		"base_delay_rand"
+		"execute_on_startup"
 	}
 
 	self:switch()
@@ -136,7 +132,7 @@ function AdminMissionElementsList:mouse_moved(o, x, y)
 		end
 
 		---[[ Mission Elements List Mouse Moved
-		self:update_list_with_scroll_bar(x, y)
+		-- self:update_list_with_scroll_bar(x, y)
 
 		self._touch_element_item = nil
 		if self._scroll_panel:inside(x, y) then  --如果鼠标在列表内
@@ -243,8 +239,8 @@ end
 
 function AdminMissionElementsList:mouse_wheel_up(x, y)
 	if self._elements_scroll._scroll:panel():inside(x, y) then
-		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), 60)
-		self._elements_scroll:perform_scroll(60)
+		-- self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), 60)
+		-- self._elements_scroll:perform_scroll(60)
 
 		self._elements_scroll:mouse_wheel_up(x, y)
 	end
@@ -252,52 +248,52 @@ end
 
 function AdminMissionElementsList:mouse_wheel_down(x, y)
 	if self._elements_scroll._scroll:panel():inside(x, y) then
-		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), -60)
-		self._elements_scroll:perform_scroll(-60)
+		-- self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), -60)
+		-- self._elements_scroll:perform_scroll(-60)
 
 		self._elements_scroll:mouse_wheel_down(x, y)
 	end
 end
 
-function AdminMissionElementsList:wheel_scroll(items, h, panel_h, dy)
-	local panels = items
+-- function AdminMissionElementsList:wheel_scroll(items, h, panel_h, dy)
+-- 	local panels = items
 
-	if h * #panels >= panel_h then
-		if dy > 0 then
-			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
-		else
-			if panels[#panels]:bottom() + dy <= panel_h then
-				dy = panel_h - panels[#panels]:bottom()
-			end
-		end
+-- 	if h * #panels >= panel_h then
+-- 		if dy > 0 then
+-- 			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
+-- 		else
+-- 			if panels[#panels]:bottom() + dy <= panel_h then
+-- 				dy = panel_h - panels[#panels]:bottom()
+-- 			end
+-- 		end
 
-		for _, panel in ipairs(panels) do
-			panel:set_y(panel:top() + dy)
-		end
-	end
-end
+-- 		for _, panel in ipairs(panels) do
+-- 			panel:set_y(panel:top() + dy)
+-- 		end
+-- 	end
+-- end
 
-function AdminMissionElementsList:update_list_with_scroll_bar()
-	if self._elements_scroll._scroll._grabbed_scroll_bar then
-		local canvas_h = self._elements_scroll._scroll:canvas():h() ~= 0 and self._elements_scroll._scroll:canvas():h() or 1
-		local at = self._elements_scroll._scroll:canvas():top() / (self._elements_scroll._scroll:scroll_panel():h() - canvas_h)
+-- function AdminMissionElementsList:update_list_with_scroll_bar()
+-- 	if self._elements_scroll._scroll._grabbed_scroll_bar then
+-- 		local canvas_h = self._elements_scroll._scroll:canvas():h() ~= 0 and self._elements_scroll._scroll:canvas():h() or 1
+-- 		local at = self._elements_scroll._scroll:canvas():top() / (self._elements_scroll._scroll:scroll_panel():h() - canvas_h)
 
-		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
+-- 		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
 
-		-- 计算内容面板的最大滚动距离
-		local max_content_scroll = (self._mission_element_h * #self._elements_scroll:items()) - self._elements_scroll:h()
+-- 		-- 计算内容面板的最大滚动距离
+-- 		local max_content_scroll = (self._mission_element_h * #self._elements_scroll:items()) - self._elements_scroll:h()
 
-		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
-		local target_content_y = -scroll_ratio * max_content_scroll
-		local current_content_y = self._elements_scroll:items()[1]:top()
+-- 		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
+-- 		local target_content_y = -scroll_ratio * max_content_scroll
+-- 		local current_content_y = self._elements_scroll:items()[1]:top()
 
-		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
-		local dy = target_content_y - current_content_y
+-- 		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
+-- 		local dy = target_content_y - current_content_y
 
-		-- 调用 wheel_scroll 进行滚动
-		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), dy)
-	end
-end
+-- 		-- 调用 wheel_scroll 进行滚动
+-- 		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), dy)
+-- 	end
+-- end
 
 
 function AdminMissionElementsList:update_list_rect(type)
@@ -392,7 +388,7 @@ function AdminMissionElementsList:show_mission_elements()
 	self._ui.info = self._ws:panel():panel({
 		visible = false,
 		layer = self._main_layer,
-		w = 600,
+		w = 650,
 		h = self._elements_scroll:canvas():h()
 	})
 
@@ -441,7 +437,7 @@ function AdminMissionElementsList:show_mission_elements()
 	self._elements_scroll:add_lines_and_static_down_indicator()
 	for name, data in pairs(managers.mission:scripts()) do
 		for id, element in pairs(data:elements()) do
-			local item = self._elements_scroll:add_item(self:set_element_panel(self._scroll_panel, {
+			local item = self._elements_scroll:add_item(self:set_element_panel(self._elements_scroll:canvas(), {
 				element = element,
 				h = self._mission_element_h
 			}))
@@ -542,7 +538,7 @@ function AdminMissionElementsList:update_items_list(scroll_position, search_list
 			if string.is_nil_or_empty(search_text) or string.find(string.lower(element:editor_name()), search_text, nil, true) or 
 				string.is_nil_or_empty(search_text) or string.find(tostring(element:id()), search_text, nil, true)
 			then
-				self._elements_scroll:add_item(self:set_element_panel(self._scroll_panel,{
+				self._elements_scroll:add_item(self:set_element_panel(self._elements_scroll:canvas(),{
 					element = element,
 					h = self._mission_element_h
 				}))
@@ -554,6 +550,7 @@ end
 function AdminMissionElementsList:set_element_info(element, panel, title_panel, w, h)
 	if self._info_class then
 		for _, cls in pairs(self._info_class) do
+			managers.mission._fading_debug_output:script().log(tostring(alive(cls:parent())), Color.white)
 			if cls:parent() and alive(cls:parent()) then
 				cls:destroy()
 			end
@@ -569,7 +566,7 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		title_panel:child("text"):set_text(element:editor_name() .. " : " .. tostring(element:id()))
 	end
 
-	local _w = w or panel:w() / 2
+	local _w = w or 300
 	local _h = h or 30
 
 	-- Enabled
@@ -612,7 +609,6 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 
 	trigger_times:set_clickout_callback(function(time)
 		self._selected = false
-		self:send_log(type(time))
 		element:set_trigger_times(time)
 	end)
 
@@ -637,7 +633,6 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 
 	base_delay:set_clickout_callback(function(time)
 		self._selected = false
-		self:send_log(type(time))
 		element._values.base_delay = time
 	end)
 
@@ -665,20 +660,20 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		element._values.base_delay_rand = time
 	end)
 
-	-- Executed on_executed
-	self._info_class.on_executed = AdminButton:new(panel, {
+	-- Executed executed
+	self._info_class.executed = AdminButton:new(panel, {
 		visible = true,
 		text = "Executed",
 		w = _w,
 		h = _h
 	})
 
-	local on_executed = self._info_class.on_executed
+	local executed = self._info_class.executed
 
-	on_executed:panel():set_top(base_delay_rand:panel():bottom() + 10)
-	on_executed:panel():set_left(base_delay_rand:panel():left())
+	executed:panel():set_top(base_delay_rand:panel():bottom() + 10)
+	executed:panel():set_left(base_delay_rand:panel():left())
 
-	on_executed:set_callback(function()
+	executed:set_callback(function()
 		element:on_executed()
 	end)
 
@@ -720,14 +715,14 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 
 	local link_by = self._info_class.link_by
 
-	link_by:panel():set_top(on_executed:panel():bottom() + 10)
-	link_by:panel():set_left(on_executed:panel():left())
+	link_by:panel():set_top(executed:panel():bottom() + 10)
+	link_by:panel():set_left(executed:panel():left())
 
 	link_by:add_lines_and_static_down_indicator()
 
 	for _, _element in ipairs(get_parent_elements(element) or {}) do
 		-- local _element = managers.mission:get_element_by_id(data.id)
-		self._info_class["elements | " .. tostring(_element:id())] = AdminButton:new(link_by:panel(), {
+		self._info_class["elements | " .. tostring(_element:id())] = AdminButton:new(link_by:canvas(), {
 			visible = true,
 			text = _element:editor_name(),
 			w = _w,
@@ -749,7 +744,7 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 
 	-- Link To -------------------------
 
-	self._info_class.link_to = AdminScrollList:new(panel, {
+	self._info_class.on_executed = AdminScrollList:new(panel, {
 		scrollbar_padding = 0,
 		bar_minimum_size = 16,
 		padding = 0,
@@ -761,16 +756,16 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		padding = 0
 	})
 
-	local link_to = self._info_class.link_to
+	local on_executed = self._info_class.on_executed
 
-	link_to:panel():set_top(link_by:panel():bottom() + 10)
-	link_to:panel():set_left(link_by:panel():left())
+	on_executed:panel():set_top(link_by:panel():bottom() + 10)
+	on_executed:panel():set_left(link_by:panel():left())
 
-	link_to:add_lines_and_static_down_indicator()
+	on_executed:add_lines_and_static_down_indicator()
 
 	for _, data in ipairs(element._values.on_executed or {}) do
 		local _element = managers.mission:get_element_by_id(data.id)
-		self._info_class["elements | " .. tostring(_element:id())] = AdminButton:new(link_to:panel(), {
+		self._info_class["elements | " .. tostring(_element:id())] = AdminButton:new(on_executed:canvas(), {
 			visible = true,
 			text = _element:editor_name(),
 			w = _w,
@@ -783,10 +778,10 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 			self:set_element_info(_element, self._ui.info, self._ui.title)
 		end)
 
-		link_to:add_item(element_button:panel())
+		on_executed:add_item(element_button:panel())
 	end
 
-	for _, item in ipairs(link_to:items() or {}) do
+	for _, item in ipairs(on_executed:items() or {}) do
 		item:set_left(2)
 	end
 
@@ -794,16 +789,15 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 		scrollbar_padding = 0,
 		bar_minimum_size = 16,
 		padding = 0,
-		w = panel:w() / 2,
+		w = 300,
 		h = panel:h(),
-		input_focus = true,
-		title = "Value"
+		input_focus = true
 	}, {
 		padding = 0
 	})
 
 	local value_list = self._info_class.value_list
-	value_list:panel():set_left(link_to:panel():right())
+	value_list:panel():set_left(on_executed:panel():right())
 	value_list:add_lines_and_static_down_indicator()
 
 	for name, v in pairs(element._values) do
@@ -815,13 +809,13 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 			end
 		end
 
-		if not _return then
+		if not self._info_class[name] and not _return then
 			if type(v) == "boolean" then
-				self._info_class[name] = AdminToggleButton:new(value_list:panel(), {
+				self._info_class[name] = AdminToggleButton:new(value_list:canvas(), {
 					visible = true,
 					text = name,
 					state = v,
-					w = _w - 24,
+					w = value_list:canvas():w(),
 					h = _h,
 					x = 2
 				})
@@ -836,12 +830,12 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 			elseif type(v) == "string" or type(v) == "number" then
 				local is_num_only = type(v) == "number"
 
-				self._info_class[name] = AdminInputBox:new(value_list:panel(), self._ws, {
+				self._info_class[name] = AdminInputBox:new(value_list:canvas(), self._ws, {
 					visible = true,
 					text = name,
 					value = tostring(v or ""),
 					num_only = is_num_only,
-					w = _w - 24,
+					w = value_list:canvas():w(),
 					h = _h
 				})
 
@@ -855,11 +849,80 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 
 				input_v:set_clickout_callback(function(value)
 					self._selected = false
-					self:send_log(type(value))
 					element._values[name] = value
 				end)
 
 				value_list:add_item(input_v:panel())
+			elseif type(v) == "table" then
+				self._info_class[name] = AdminScrollList:new(value_list:canvas(), {
+					scrollbar_padding = 0,
+					bar_minimum_size = 16,
+					padding = 0,
+					w = value_list:panel():w() - 2,
+					h = 181,
+					input_focus = true,
+					title = name,
+					title_font_size = 50 - #name
+				}, {
+					padding = 0
+				})
+
+				local list_v = self._info_class[name]
+
+				list_v:panel():rect({
+					color = Color.black,
+					w = list_v:canvas():w(),
+					h = list_v:panel():h(),
+					layer = -1,
+					alpha = 0.5
+				})
+
+				list_v:add_lines_and_static_down_indicator()
+
+				value_list:add_item(list_v:panel())
+
+				for key, data in ipairs(v) do
+					local _can_press = false
+					local _callback = function() end
+					local _text = tostring(data)
+
+					if type(data) == "number" then
+						local _element = managers.mission:get_element_by_id(data)
+						if _element then
+							_text = _element:editor_name()
+
+							_can_press = true
+							_callback = function()
+								self:set_element_info(_element, self._ui.info, self._ui.title)
+							end
+						else
+							local world_unit = managers.worlddefinition:get_unit(data)
+
+							if world_unit then
+								_text = "UnitId: " .. tostring(data)
+							end
+						end
+					elseif type(data) == "table" then
+						_text = "Unknown: " .. tostring(data.name)
+
+						for k, v in pairs(data) do
+						end
+					end
+
+					self._info_class[name .. tostring(key)] = AdminButton:new(list_v:canvas(), {
+						visible = true,
+						text = _text,
+						can_press = _can_press,
+						w = _w,
+						h = _h
+					})
+					
+					local button_in_list_v = self._info_class[name .. tostring(key)]
+
+					button_in_list_v:set_callback(_callback)
+
+					list_v:add_item(button_in_list_v:panel())
+				end
 			end
 		end
 	end
@@ -893,7 +956,9 @@ end
 AdminButton = AdminButton or class()
 
 function AdminButton:init(panel, data)
+	self.class = "button"
 	self._parent = panel
+	self._can_press = not (tostring(data.can_press) == "false") and true or false
 
 	self._panel = panel:panel({
 		name = data.name,
@@ -952,6 +1017,10 @@ function AdminButton:set_callback(clbk)
 end
 
 function AdminButton:mouse_moved(o, x, y)
+	if not self._can_press then
+		return false
+	end
+
 	local mouse_inside = false
 
 	if self:inside(x, y) then
@@ -989,6 +1058,7 @@ end
 AdminToggleButton = AdminToggleButton or class()
 
 function AdminToggleButton:init(panel, data)
+	self.class = "toggle"
 	self._parent = panel
 	self._state = data.state or false
 
@@ -1026,7 +1096,7 @@ function AdminToggleButton:init(panel, data)
 		h = data.box_size
 	})
 
-	tickbox_toggle:set_right(self._panel:right())
+	tickbox_toggle:set_right(self._panel:right() - 4)
 	tickbox_toggle:set_center_y(self._panel:h() / 2)
 
 	local tickbox_text = self._panel:text({
@@ -1122,6 +1192,7 @@ end
 AdminInputBox = AdminInputBox or class()
 
 function AdminInputBox:init(panel, ws, data)
+	self.class = "input"
 	self._ws = ws
 	self._parent = panel
 	self._max_length = data.max_length or 100
@@ -1213,11 +1284,13 @@ function AdminInputBox:mouse_moved(o, x, y)
 end
 
 function AdminInputBox:mouse_pressed(button, x, y)
-	if self:inside(x, y) then
-		self:set_editing(true)
-		self:click()
-	elseif self._editing then
-		self:set_editing(false)
+	if button == Idstring("0") then
+		if self:inside(x, y) then
+			self:set_editing(true)
+			self:click()
+		elseif self._editing then
+			self:set_editing(false)
+		end
 	end
 end
 
@@ -1480,18 +1553,20 @@ function AdminInputBox:handle_key(k, pressed)
 	self:update_caret()
 end
 
-AdminScrollList = AdminScrollList or class()
+AdminScrollList = AdminScrollList or class(ScrollItemList)
 
-function AdminScrollList:init(panel, data, canvas_config)
-	self._scroll_item_list = ScrollItemList:new(panel, data, canvas_config)
-	self._panel = self._scroll_item_list._panel
+function AdminScrollList:init(panel, data, canvas_config, ...)
+	AdminScrollList.super.init(self, panel, data, canvas_config, ...)
+	
+	self.class = "list"
+	self._panel = self._panel
 	self._parent = panel
 	self._h = data.h or panel:h() / 2
 	self._dy = data.dy or 30
 
 	if data.items then
 		for _, item in ipairs(data.items) do
-			self._scroll_item_list:add_item(item)
+			self:add_item(item)
 		end
 	end
 
@@ -1505,12 +1580,13 @@ function AdminScrollList:init(panel, data, canvas_config)
 		font = tweak_data.hud_players.ammo_font,
 		text = data.title or "",
 		alpha = 0.6,
-		font_size = 50,
-		render_template = Idstring("VertexColorTextured")
+		font_size = data.title_font_size or 50
 	})
 
+	-- managers.hud:make_fine_text(title)
+	title:set_right(self:canvas():w())
 	title:set_top(self:canvas():top())
-	title:set_right(self:canvas():right())
+
 end
 
 function AdminScrollList:panel()
@@ -1521,134 +1597,130 @@ function AdminScrollList:parent()
 	return self._parent
 end
 
-function AdminScrollList:canvas()
-	return self._scroll_item_list._canvas
-end
-
 function AdminScrollList:destroy()
 	self:parent():remove(self._panel)
 end
 
-function AdminScrollList:mouse_moved(o, x, y)
-	local mouse_inside = false
+-- function AdminScrollList:mouse_moved(o, x, y)
+-- 	local mouse_inside = false
 
-	self:update_list_with_scroll_bar()
-	self._scroll_item_list:mouse_moved(o, x, y)
+-- 	-- self:update_list_with_scroll_bar()
+-- 	self:mouse_moved(o, x, y)
 
-	-- 如果鼠标在滑槽上就设置鼠标为link
-	if self._scroll_item_list._scroll._scroll_bar:inside(x, y) or self._scroll_item_list._scroll._grabbed_scroll_bar then
-		mouse_inside = true
-	end
+-- 	-- 如果鼠标在滑槽上就设置鼠标为link
+-- 	if self._scroll._scroll_bar:inside(x, y) or self._scroll._grabbed_scroll_bar then
+-- 		mouse_inside = true
+-- 	end
 
-	return mouse_inside
-end
+-- 	return mouse_inside
+-- end
 
 function AdminScrollList:mouse_pressed(button, x, y)
-	if self:inside(x, y) then
+	-- if self:inside(x, y) then
 		if button == Idstring("mouse wheel up") then
 			return self:mouse_wheel_up(x, y)
 		elseif button == Idstring("mouse wheel down") then
 			return self:mouse_wheel_down(x, y)
 		end
-	end
+	-- end
 
-	self._scroll_item_list:mouse_pressed(button, x, y)
+	self.super.mouse_pressed(self, button, x, y)
 end
 
-function AdminScrollList:mouse_released(button, x, y)
-	self._scroll_item_list:mouse_released(button, x, y)
-end
+-- function AdminScrollList:mouse_released(button, x, y)
+-- 	self._scroll_item_list:mouse_released(button, x, y)
+-- end
 
-function AdminScrollList:mouse_wheel_up(x, y)
-	if self._scroll_item_list._canvas:inside(x, y) then
-		self:wheel_scroll(self._dy)
-		self._scroll_item_list:perform_scroll(self._dy)
+-- function AdminScrollList:mouse_wheel_up(x, y)
+-- 	if self._scroll_item_list._canvas:inside(x, y) then
+-- 		-- self:wheel_scroll(self._dy)
+-- 		self._scroll_item_list:perform_scroll(self._dy)
 
-		self._scroll_item_list:mouse_wheel_up(x, y)
-	end
-end
+-- 		self._scroll_item_list:mouse_wheel_up(x, y)
+-- 	end
+-- end
 
-function AdminScrollList:mouse_wheel_down(x, y)
-	if self._scroll_item_list._canvas:inside(x, y) then
-		self:wheel_scroll(-self._dy)
-		self._scroll_item_list:perform_scroll(-self._dy)
+-- function AdminScrollList:mouse_wheel_down(x, y)
+-- 	if self._scroll_item_list._canvas:inside(x, y) then
+-- 		-- self:wheel_scroll(-self._dy)
+-- 		self._scroll_item_list:perform_scroll(-self._dy)
 
-		self._scroll_item_list:mouse_wheel_down(x, y)
-	end
-end
+-- 		self._scroll_item_list:mouse_wheel_down(x, y)
+-- 	end
+-- end
 
-function AdminScrollList:inside(x, y)
-	if self._scroll_item_list._canvas:inside(x, y) then
-		return true, "link"
-	end
+-- function AdminScrollList:inside(x, y)
+-- 	if self._scroll_item_list._canvas:inside(x, y) then
+-- 		return true, "link"
+-- 	end
 
-	return false, "arrow"
-end
+-- 	return false, "arrow"
+-- end
 
-function AdminScrollList:add_lines_and_static_down_indicator()
-	self._scroll_item_list:add_lines_and_static_down_indicator()
-end
+-- function AdminScrollList:add_lines_and_static_down_indicator()
+-- 	self._scroll_item_list:add_lines_and_static_down_indicator()
+-- end
 
-function AdminScrollList:items()
-	return self._scroll_item_list:items()
-end
+-- function AdminScrollList:items()
+-- 	return self._scroll_item_list:items()
+-- end
 
-function AdminScrollList:add_item(item)
-	self._scroll_item_list:add_item(item)
-end
+-- function AdminScrollList:add_item(item)
+-- 	self._scroll_item_list:add_item(item)
+-- end
 
-function AdminScrollList:clear()
-	self._scroll_item_list:clear()
-end
+-- function AdminScrollList:clear()
+-- 	self._scroll_item_list:clear()
+-- end
 
-function AdminScrollList:wheel_scroll(dy)
-	local panels = self._scroll_item_list:items()
-	local panel_h = self._scroll_item_list:h()
-	local dy = dy or self._dy
+-- function AdminScrollList:wheel_scroll(dy)
+-- 	local panels = self._scroll_item_list:items()
+-- 	local panel_h = self._scroll_item_list:h()
+-- 	local dy = dy or self._dy
 
-	local list_h = 0
-	for _, v in ipairs(panels) do
-		list_h = list_h + v:h()
-	end
+-- 	local list_h = 0
+-- 	for _, v in ipairs(panels) do
+-- 		list_h = list_h + v:h()
+-- 	end
 
-	if list_h >= panel_h then
-		if dy > 0 then
-			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
-		else
-			if panels[#panels]:bottom() + dy <= panel_h then
-				dy = panel_h - panels[#panels]:bottom()
-			end
-		end
+-- 	if list_h >= panel_h then
+-- 		if dy > 0 then
+-- 			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
+-- 		else
+-- 			if panels[#panels]:bottom() + dy <= panel_h then
+-- 				dy = panel_h - panels[#panels]:bottom()
+-- 			end
+-- 		end
 
-		for _, panel in ipairs(panels) do
-			panel:set_y(panel:top() + dy)
-		end
-	end
-end
+-- 		for _, panel in ipairs(panels) do
+-- 			panel:set_y(panel:top() + dy)
+-- 		end
+-- 	end
+-- end
 
-function AdminScrollList:update_list_with_scroll_bar()
-	local list_h = 0
-	for _, v in ipairs(self._scroll_item_list:items()) do
-		list_h = list_h + v:h()
-	end	
+-- function AdminScrollList:update_list_with_scroll_bar()
+-- 	local list_h = 0
+-- 	for _, v in ipairs(self._scroll_item_list:items()) do
+-- 		list_h = list_h + v:h()
+-- 	end	
 
-	if self._scroll_item_list._scroll._grabbed_scroll_bar then
-		local canvas_h = self._scroll_item_list._scroll:canvas():h() ~= 0 and self._scroll_item_list._scroll:canvas():h() or 1
-		local at = self._scroll_item_list._scroll:canvas():top() / (self._scroll_item_list._scroll:scroll_panel():h() - canvas_h)
+-- 	if self._scroll_item_list._scroll._grabbed_scroll_bar then
+-- 		local canvas_h = self._scroll_item_list._scroll:canvas():h() ~= 0 and self._scroll_item_list._scroll:canvas():h() or 1
+-- 		local at = self._scroll_item_list._scroll:canvas():top() / (self._scroll_item_list._scroll:scroll_panel():h() - canvas_h)
 
-		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
+-- 		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
 
-		-- 计算内容面板的最大滚动距离
-		local max_content_scroll = list_h - self._scroll_item_list:h()
+-- 		-- 计算内容面板的最大滚动距离
+-- 		local max_content_scroll = list_h - self._scroll_item_list:h()
 
-		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
-		local target_content_y = -scroll_ratio * max_content_scroll
-		local current_content_y = self._scroll_item_list:items()[1]:top()
+-- 		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
+-- 		local target_content_y = -scroll_ratio * max_content_scroll
+-- 		local current_content_y = self._scroll_item_list:items()[1]:top()
 
-		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
-		local dy = target_content_y - current_content_y
+-- 		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
+-- 		local dy = target_content_y - current_content_y
 
-		-- 调用 wheel_scroll 进行滚动
-		self:wheel_scroll(dy)
-	end
-end
+-- 		-- 调用 wheel_scroll 进行滚动
+-- 		self:wheel_scroll(dy)
+-- 	end
+-- end
