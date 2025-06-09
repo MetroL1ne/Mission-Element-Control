@@ -883,10 +883,7 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 					list_v:add_item(button_in_list_v:panel())
 				end
 			elseif type(v) == "userdata" then
-				local function set_vector3_panel(panel)
-				end
-
-				self:send_log(mvector3.x(v))
+				
 			end
 		end
 	end
