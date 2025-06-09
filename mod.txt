@@ -1,7 +1,7 @@
 {
-	"name": "Mission Element List",
+	"name": "Mission Element Control",
 	"author": "MetroLine",
-	"version": "0.14",
+	"version": "0.15",
 	"hooks": [
 		{
 			"hook_id" : "lib/setups/gamesetup",
