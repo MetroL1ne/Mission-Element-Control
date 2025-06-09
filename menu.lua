@@ -6,6 +6,10 @@ function AdminMissionElementsList:init()
 end
 
 function AdminMissionElementsList:setup()
+	if not Network:is_server() then
+		return
+	end
+
 	self._mission_element_h = 30
 	self._base_info_w = 200
 	self._base_info_h = 30
