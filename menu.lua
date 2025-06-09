@@ -132,8 +132,6 @@ function AdminMissionElementsList:mouse_moved(o, x, y)
 		end
 
 		---[[ Mission Elements List Mouse Moved
-		-- self:update_list_with_scroll_bar(x, y)
-
 		self._touch_element_item = nil
 		if self._scroll_panel:inside(x, y) then  --如果鼠标在列表内
 			local item = self:get_panel_under_mouse(x, y)  -- 检测有没有鼠标有没有在其中一个item之上
@@ -218,10 +216,6 @@ function AdminMissionElementsList:mouse_pressed(o, button, x, y)
 end
 
 function AdminMissionElementsList:mouse_released(o, button, x, y)
-	-- if self._selected then
-	-- 	return
-	-- end
-
 	self._elements_scroll:mouse_released(button, x, y)
 
 	for _, cls in pairs(self._info_class) do
@@ -230,71 +224,20 @@ function AdminMissionElementsList:mouse_released(o, button, x, y)
 end
 
 function AdminMissionElementsList:mouse_clicked(o, button, x, y)
-	-- if self._selected then
-	-- 	return
-	-- end
-
 	self._elements_scroll:mouse_clicked(o, button, x, y)
 end
 
 function AdminMissionElementsList:mouse_wheel_up(x, y)
 	if self._elements_scroll._scroll:panel():inside(x, y) then
-		-- self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), 60)
-		-- self._elements_scroll:perform_scroll(60)
-
 		self._elements_scroll:mouse_wheel_up(x, y)
 	end
 end
 
 function AdminMissionElementsList:mouse_wheel_down(x, y)
 	if self._elements_scroll._scroll:panel():inside(x, y) then
-		-- self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), -60)
-		-- self._elements_scroll:perform_scroll(-60)
-
 		self._elements_scroll:mouse_wheel_down(x, y)
 	end
 end
-
--- function AdminMissionElementsList:wheel_scroll(items, h, panel_h, dy)
--- 	local panels = items
-
--- 	if h * #panels >= panel_h then
--- 		if dy > 0 then
--- 			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
--- 		else
--- 			if panels[#panels]:bottom() + dy <= panel_h then
--- 				dy = panel_h - panels[#panels]:bottom()
--- 			end
--- 		end
-
--- 		for _, panel in ipairs(panels) do
--- 			panel:set_y(panel:top() + dy)
--- 		end
--- 	end
--- end
-
--- function AdminMissionElementsList:update_list_with_scroll_bar()
--- 	if self._elements_scroll._scroll._grabbed_scroll_bar then
--- 		local canvas_h = self._elements_scroll._scroll:canvas():h() ~= 0 and self._elements_scroll._scroll:canvas():h() or 1
--- 		local at = self._elements_scroll._scroll:canvas():top() / (self._elements_scroll._scroll:scroll_panel():h() - canvas_h)
-
--- 		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
-
--- 		-- 计算内容面板的最大滚动距离
--- 		local max_content_scroll = (self._mission_element_h * #self._elements_scroll:items()) - self._elements_scroll:h()
-
--- 		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
--- 		local target_content_y = -scroll_ratio * max_content_scroll
--- 		local current_content_y = self._elements_scroll:items()[1]:top()
-
--- 		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
--- 		local dy = target_content_y - current_content_y
-
--- 		-- 调用 wheel_scroll 进行滚动
--- 		self:wheel_scroll(self._elements_scroll:items(), self._mission_element_h, self._elements_scroll:h(), dy)
--- 	end
--- end
-
 
 function AdminMissionElementsList:update_list_rect(type)
 	if type == "mouse_moved" then
@@ -388,7 +331,7 @@ function AdminMissionElementsList:show_mission_elements()
 	self._ui.info = self._ws:panel():panel({
 		visible = false,
 		layer = self._main_layer,
-		w = 650,
+		w = 600,
 		h = self._elements_scroll:canvas():h()
 	})
 
@@ -471,7 +414,7 @@ function AdminMissionElementsList:set_element_panel(panel, data)
 	self._bg = element_panel:rect({
 		name = "bg",
 		visible = false,
-		color = Color.green,
+		color = Color.black,
 		layer = -1,
 		alpha = 0.7,
 		w = element_panel:w(),
@@ -550,7 +493,6 @@ end
 function AdminMissionElementsList:set_element_info(element, panel, title_panel, w, h)
 	if self._info_class then
 		for _, cls in pairs(self._info_class) do
-			managers.mission._fading_debug_output:script().log(tostring(alive(cls:parent())), Color.white)
 			if cls:parent() and alive(cls:parent()) then
 				cls:destroy()
 			end
@@ -885,11 +827,13 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 					local _can_press = false
 					local _callback = function() end
 					local _text = tostring(data)
+					local _m_text = ""
 
 					if type(data) == "number" then
 						local _element = managers.mission:get_element_by_id(data)
 						if _element then
 							_text = _element:editor_name()
+							_m_text = tostring(_element:id())
 
 							_can_press = true
 							_callback = function()
@@ -913,16 +857,36 @@ function AdminMissionElementsList:set_element_info(element, panel, title_panel, 
 						visible = true,
 						text = _text,
 						can_press = _can_press,
-						w = _w,
+						w = list_v:canvas():w(),
 						h = _h
 					})
 					
 					local button_in_list_v = self._info_class[name .. tostring(key)]
 
+					local IdInfo = button_in_list_v:panel():text({
+						name = "text",
+						color = Color.white,
+						vertical = "center",
+						valign = "right",
+						align = "right",
+						halign = "center",
+						font = tweak_data.hud_players.ammo_font,
+						text = _m_text,
+						font_size = 20
+					})
+
+					IdInfo:set_right(button_in_list_v:panel():right())
+					IdInfo:set_center_y(button_in_list_v:panel():center_y())
+
 					button_in_list_v:set_callback(_callback)
 
 					list_v:add_item(button_in_list_v:panel())
 				end
+			elseif type(v) == "userdata" then
+				local function set_vector3_panel(panel)
+				end
+
+				self:send_log(mvector3.x(v))
 			end
 		end
 	end
@@ -1562,7 +1526,7 @@ function AdminScrollList:init(panel, data, canvas_config, ...)
 	self._panel = self._panel
 	self._parent = panel
 	self._h = data.h or panel:h() / 2
-	self._dy = data.dy or 30
+	self._dy = data.dy or 1
 
 	if data.items then
 		for _, item in ipairs(data.items) do
@@ -1583,7 +1547,6 @@ function AdminScrollList:init(panel, data, canvas_config, ...)
 		font_size = data.title_font_size or 50
 	})
 
-	-- managers.hud:make_fine_text(title)
 	title:set_right(self:canvas():w())
 	title:set_top(self:canvas():top())
 
@@ -1601,126 +1564,40 @@ function AdminScrollList:destroy()
 	self:parent():remove(self._panel)
 end
 
--- function AdminScrollList:mouse_moved(o, x, y)
--- 	local mouse_inside = false
-
--- 	-- self:update_list_with_scroll_bar()
--- 	self:mouse_moved(o, x, y)
-
--- 	-- 如果鼠标在滑槽上就设置鼠标为link
--- 	if self._scroll._scroll_bar:inside(x, y) or self._scroll._grabbed_scroll_bar then
--- 		mouse_inside = true
--- 	end
-
--- 	return mouse_inside
--- end
-
 function AdminScrollList:mouse_pressed(button, x, y)
-	-- if self:inside(x, y) then
-		if button == Idstring("mouse wheel up") then
-			return self:mouse_wheel_up(x, y)
-		elseif button == Idstring("mouse wheel down") then
-			return self:mouse_wheel_down(x, y)
-		end
-	-- end
+	if button == Idstring("mouse wheel up") then
+		return self:mouse_wheel_up(x, y)
+	elseif button == Idstring("mouse wheel down") then
+		return self:mouse_wheel_down(x, y)
+	end
 
 	self.super.mouse_pressed(self, button, x, y)
 end
 
--- function AdminScrollList:mouse_released(button, x, y)
--- 	self._scroll_item_list:mouse_released(button, x, y)
--- end
+function AdminScrollList:mouse_wheel_up(x, y)
+	if not alive(self._scroll) then
+		return
+	end
 
--- function AdminScrollList:mouse_wheel_up(x, y)
--- 	if self._scroll_item_list._canvas:inside(x, y) then
--- 		-- self:wheel_scroll(self._dy)
--- 		self._scroll_item_list:perform_scroll(self._dy)
+	self._scroll:scroll(x, y, self._dy)
 
--- 		self._scroll_item_list:mouse_wheel_up(x, y)
--- 	end
--- end
+	if not self._scroll:panel():inside(x, y) then
+		return
+	end
 
--- function AdminScrollList:mouse_wheel_down(x, y)
--- 	if self._scroll_item_list._canvas:inside(x, y) then
--- 		-- self:wheel_scroll(-self._dy)
--- 		self._scroll_item_list:perform_scroll(-self._dy)
+	return AdminScrollList.super.super.super.mouse_wheel_up(self, x, y)
+end
 
--- 		self._scroll_item_list:mouse_wheel_down(x, y)
--- 	end
--- end
+function AdminScrollList:mouse_wheel_down(x, y)
+	if not alive(self._scroll) then
+		return
+	end
 
--- function AdminScrollList:inside(x, y)
--- 	if self._scroll_item_list._canvas:inside(x, y) then
--- 		return true, "link"
--- 	end
+	self._scroll:scroll(x, y, -self._dy)
 
--- 	return false, "arrow"
--- end
+	if not self._scroll:panel():inside(x, y) then
+		return
+	end
 
--- function AdminScrollList:add_lines_and_static_down_indicator()
--- 	self._scroll_item_list:add_lines_and_static_down_indicator()
--- end
-
--- function AdminScrollList:items()
--- 	return self._scroll_item_list:items()
--- end
-
--- function AdminScrollList:add_item(item)
--- 	self._scroll_item_list:add_item(item)
--- end
-
--- function AdminScrollList:clear()
--- 	self._scroll_item_list:clear()
--- end
-
--- function AdminScrollList:wheel_scroll(dy)
--- 	local panels = self._scroll_item_list:items()
--- 	local panel_h = self._scroll_item_list:h()
--- 	local dy = dy or self._dy
-
--- 	local list_h = 0
--- 	for _, v in ipairs(panels) do
--- 		list_h = list_h + v:h()
--- 	end
-
--- 	if list_h >= panel_h then
--- 		if dy > 0 then
--- 			dy = panels[1]:top() + dy >= 0 and -panels[1]:top() or dy
--- 		else
--- 			if panels[#panels]:bottom() + dy <= panel_h then
--- 				dy = panel_h - panels[#panels]:bottom()
--- 			end
--- 		end
-
--- 		for _, panel in ipairs(panels) do
--- 			panel:set_y(panel:top() + dy)
--- 		end
--- 	end
--- end
-
--- function AdminScrollList:update_list_with_scroll_bar()
--- 	local list_h = 0
--- 	for _, v in ipairs(self._scroll_item_list:items()) do
--- 		list_h = list_h + v:h()
--- 	end	
-
--- 	if self._scroll_item_list._scroll._grabbed_scroll_bar then
--- 		local canvas_h = self._scroll_item_list._scroll:canvas():h() ~= 0 and self._scroll_item_list._scroll:canvas():h() or 1
--- 		local at = self._scroll_item_list._scroll:canvas():top() / (self._scroll_item_list._scroll:scroll_panel():h() - canvas_h)
-
--- 		local scroll_ratio = at  --获取当前scroll bar的值 ( 0 - 1 )
-
--- 		-- 计算内容面板的最大滚动距离
--- 		local max_content_scroll = list_h - self._scroll_item_list:h()
-
--- 		-- 计算内容面板的目标位置（负数，因为内容面板是向下移动的）
--- 		local target_content_y = -scroll_ratio * max_content_scroll
--- 		local current_content_y = self._scroll_item_list:items()[1]:top()
-
--- 		-- 计算需要滚动的偏移量（当前内容面板的 y 与目标位置的差值）
--- 		local dy = target_content_y - current_content_y
-
--- 		-- 调用 wheel_scroll 进行滚动
--- 		self:wheel_scroll(dy)
--- 	end
--- end
+	return AdminScrollList.super.super.super.mouse_wheel_down(self, x, y)
+end
