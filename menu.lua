@@ -927,7 +927,7 @@ function AdminButton:init(panel, data)
 
 	self._panel = panel:panel({
 		name = data.name,
-		visible = tostring(data.visible) == "false" and false or true,
+		visible = data.visible,
 		layer = data.layer,
 		w = data.w,
 		h = data.h,
@@ -1029,7 +1029,7 @@ function AdminToggleButton:init(panel, data)
 
 	self._panel = panel:panel({
 		name = data.name,
-		visible = tostring(data.visible) == "false" and false or true,
+		visible = data.visible,
 		layer = data.layer,
 		w = data.w,
 		h = data.h,
@@ -1165,7 +1165,7 @@ function AdminInputBox:init(panel, ws, data)
 
 	self._panel = panel:panel({
 		name = data.name,
-		visible = tostring(data.visible) == "false" and false or true,
+		visible = data.visible,
 		layer = data.layer,
 		w = data.w,
 		h = data.h,
